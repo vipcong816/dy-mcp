@@ -47,14 +47,28 @@
 
 5.  **启动项目**:
     ```bash
-    python server.py
+    python server_streamable_http.py
+    ```
+	
+6.  **STDIO配置**:
+    ```bash
+	{
+	  "mcpServers": {
+		"dyn-mcp": {
+		  "command": "C:/Users/你的用户名/miniconda3/envs/环境名/python.exe",
+		  "args": ["server.py"]
+		}
+	  }
+	}
     ```
 
-6.  **MCP Inspector 配置**:
+7.  **MCP Inspector 配置**:
     ```bash
     npx @modelcontextprotocol/inspector
     ```
-    如图所示
-	也可以接入n8n工作流中
+    streamable_httt如图所示
 
 	![MCP Inspector 配置图](media/ins.png)
+	
+	STDIO如图所示
+	![MCP Inspector 配置图](media/st.png)

@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).parent.resolve()
 LOCAL_CHROME_PATH = "C:\Program Files\Google\Chrome\Application\chrome.exe"   # change me necessary！ for example C:/Program Files/Google/Chrome/Application/chrome.exe
 
 # -------------------- MCP 初始化 --------------------
-mcp = FastMCP("douyin-mcp-server")
+mcp = FastMCP("streamable-http-server")
 
 HEADERS = {
     'User-Agent': (
@@ -524,5 +524,4 @@ async def upload_douyin_video(filepath: str, title: str = "", hashtags: str = ""
         }, ensure_ascii=False, indent=2)
 # -------------------- 启动 MCP 服务 --------------------
 if __name__ == "__main__":
-    #mcp.run(transport="http", host="0.0.0.0", port=18061)
-    mcp.run()
+    mcp.run(transport="http", host="0.0.0.0", port=18061)
