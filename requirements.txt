@@ -194,3 +194,6 @@ yarl==1.20.0
 ykdl==1.8.2
 yt-dlp==2025.5.22
 zipp==3.23.0
+pymediainfo
+imageio
+uiautomation>=2
