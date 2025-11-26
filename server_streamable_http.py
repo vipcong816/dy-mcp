@@ -15,7 +15,8 @@ from sys import stdout
 from fastmcp import FastMCP
 from loguru import logger
 from playwright.async_api import Playwright, async_playwright, Page
-
+import pyJianYingDraft as draft
+from pyJianYingDraft import IntroType, TransitionType, trange, tim
 BASE_DIR = Path(__file__).parent.resolve()
 LOCAL_CHROME_PATH = "C:\Program Files\Google\Chrome\Application\chrome.exe"   # change me necessary！ for example C:/Program Files/Google/Chrome/Application/chrome.exe
 
@@ -522,6 +523,78 @@ async def upload_douyin_video(filepath: str, title: str = "", hashtags: str = ""
             "status": "error",
             "error": str(e)
         }, ensure_ascii=False, indent=2)
+    
+    
+@mcp.tool()
+def generate_jianying(
+    TUTORIAL_DIR: str,
+    draft_folder: str,
+    draft_name: str = "demo",
+    text: str = "据说pyJianYingDraft效果还不错?"
+) -> str:
+    """
+    根据素材路径(TUTORIAL_DIR) 和 草稿目录(draft_folder) 生成剪映草稿.
+    """
+    # 1. 初始化 DraftFolder
+    df = draft.DraftFolder(draft_folder)
+
+    # 2. 创建草稿
+    script = df.create_draft(draft_name, 1920, 1080, allow_replace=True)
+
+    # 3. 添加轨道
+    script.add_track(draft.TrackType.audio)
+    script.add_track(draft.TrackType.video)
+    script.add_track(draft.TrackType.text)
+
+    # 4. 音频
+    audio_segment = draft.AudioSegment(
+        os.path.join(TUTORIAL_DIR, "audio.mp3"),
+        trange("0s", "5s"),
+        volume=0.6
+    )
+    audio_segment.add_fade("1s", "0s")
+
+    # 5. 视频
+    video_segment = draft.VideoSegment(
+        os.path.join(TUTORIAL_DIR, "video.mp4"),
+        trange("0s", "4.2s")
+    )
+    video_segment.add_animation(IntroType.斜切)
+
+    # 6. GIF 贴纸
+    gif_material = draft.VideoMaterial(os.path.join(TUTORIAL_DIR, "sticker.gif"))
+    gif_segment = draft.VideoSegment(
+        gif_material,
+        trange(video_segment.end, gif_material.duration)
+    )
+    gif_segment.add_background_filling("blur", 0.0625)
+
+    # 7. 转场
+    video_segment.add_transition(TransitionType.信号故障)
+
+    # 8. 将片段添加到轨道
+    script.add_segment(audio_segment)
+    script.add_segment(video_segment)
+    script.add_segment(gif_segment)
+
+    # 9. 文本
+    text_segment = draft.TextSegment(
+        text,
+        video_segment.target_timerange,
+        font=draft.FontType.文轩体,
+        style=draft.TextStyle(color=(1.0, 1.0, 0.0)),
+        clip_settings=draft.ClipSettings(transform_y=-0.8)
+    )
+    text_segment.add_animation(draft.TextOutro.故障闪动, duration=tim("1s"))
+    text_segment.add_bubble("361595", "6742029398926430728")
+    text_segment.add_effect("7296357486490144036")
+
+    script.add_segment(text_segment)
+
+    # 10. 保存草稿
+    script.save()
+
+    return f"剪映草稿已生成: {draft_name}"
 # -------------------- 启动 MCP 服务 --------------------
 if __name__ == "__main__":
     mcp.run(transport="http", host="0.0.0.0", port=18061)
